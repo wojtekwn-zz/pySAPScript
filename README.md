@@ -15,7 +15,7 @@ Note that the script is very basic, but seems to work just fine with all of
 our the processes in the company. Feedback is always welcome.
 
 ```python
-sc = SAPSciprt(sapConnectionName)   # sapConnectionName is a string with a connection name
+sc = SAPScript(sapConnectionName)   # sapConnectionName is a string with a connection name
 sc.loads('sapscript.vba')
 exec(str(sc))
 ```
