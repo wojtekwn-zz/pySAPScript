@@ -1,34 +1,35 @@
 import re
 """
-This is a very basic approach for converting vba code generated with
+This is a very basic approach for converting vb code generated with
 SAP Scripting module of SAP GUI. There are three requiremants for the script to run:
  1) code has to be executed from the machine running SAP
     - citrix will not work
-    - local instance of SAP with work just fine
+    - local instance of SAP will work just fine
  2) Windows machine
  3) win32com python library (pip install pywin32)
     - note that python and pywin32 can be installed on corporate machines
       without administrative rights, check anaconda project for details
 Note that the script is very basic, but seems to work just fine with all of
-our the processes in the company. Feedback is always welcome.
+our processes in the company. Feedback is always welcome.
 """
 
+
 class SAPScript:
-    def __init__(self, connection):
+    def __init__ (self, connection):
         self.connection = connection
         self.script = []
-        
-    def __repr__(self):
+
+    def __repr__ (self):
         return '\n'.join(self.script)
-        
-    def loads(self,sapScriptFile):
+
+    def __loads(self, sapScriptFile):
         f = open(sapScriptFile, 'r+')
         self.__sap2python(f.readlines())
-    
+
     def __processLine(self, line):
         line = line.replace('true', 'True').replace('false', 'False')
         cnt = re.split(r'(\s+)', line)
-        
+
         if len(cnt) == 1:
             return cnt[0] + '()'
         else:
@@ -38,7 +39,7 @@ class SAPScript:
                 return None
             else:
                 return cnt[0] + '(' + "".join(cnt[2:]) + ')'
-    
+
     def __sap2python(self, inputFileData):
         self.script = ['import win32com.client',
                        'import pythoncom',
@@ -56,3 +57,25 @@ class SAPScript:
                 self.script.append(self.__processLine(line[:-1]))
             if line[:6] == 'End If':
                 skip = False
+
+    def executeScript(self, sapScriptFile):
+        """
+        Executes VB script in python.
+
+        sapScriptFile as string: file with VB Script
+        """
+        self.__loads(sapScriptFile)
+        exec(str(sc))
+
+    def vbToPython(self, sapScriptFile, pyFileName):
+        """
+        Converts VB script to Python and saves it to file.
+
+        sapScriptFile as string: file with VB Script
+        pyFileName as string: name of target python file
+        """
+        pyFileName = pyFileName + '.py'
+        self.__loads(sapScriptFile)
+
+        with open(pyFileName, 'w+') as f:
+            f.write(str(sc))
